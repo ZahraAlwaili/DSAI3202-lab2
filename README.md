@@ -1,4 +1,40 @@
-# DSAI3202-lab2
+# Azure Data Ingestion Pipeline – Amazon Electronics Reviews
+
+## Overview
+This project implements a data ingestion pipeline on Azure using the Amazon Electronics Reviews dataset. Raw JSON data is stored in Azure Data Lake Storage (ADLS Gen2), transformed using Azure Data Factory (ADF), and written to Parquet format partitioned by review year.
+
+The lab demonstrates both portal-based and terminal-based ingestion workflows used in real-world data engineering.
+
+---
+
+## Technologies Used
+- Azure Blob Storage (ADLS Gen2)
+- Azure Data Factory (ADF)
+- Azure ML Compute Instance (VM)
+- Azure CLI & AzCopy
+- Python
+
+---
+
+## Dataset
+Amazon Electronics dataset from Stanford SNAP:
+- reviews_Electronics_5.json
+- meta_Electronics.json
+
+---
+
+## Data Lake Structure
+- raw/ – Original datasets
+- processed/ – Transformed Parquet data
+- curated/ – Reserved for analytics
+
+---
+
+## Data Ingestion
+
+### Product Metadata
+- Uploaded to the `raw` container using the Azure Portal
+- Converted to valid line-delimited JSON and re-uploaded as:
 
 
 <img width="1919" height="1065" alt="image" src="https://github.com/user-attachments/assets/c4c6b376-f781-4105-8356-61f00cd0392e" />
