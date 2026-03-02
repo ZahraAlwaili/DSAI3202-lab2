@@ -1,0 +1,8 @@
+name: sentiment_env
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pandas
+  - scikit-learn
+  - nltk
