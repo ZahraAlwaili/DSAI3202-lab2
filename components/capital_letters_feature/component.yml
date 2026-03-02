@@ -1,0 +1,28 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: capital_letters_feature
+display_name: Capital Letters Ratio Feature
+description: Computes the proportion of uppercase letters in review text to capture emphasis or emotion.
+type: command
+
+inputs:
+  data:
+    type: uri_folder
+    description: Input data folder containing CSV files
+  text_column:
+    type: string
+    default: review_text
+    description: Name of the column with review text
+
+outputs:
+  out:
+    type: uri_folder
+    description: Output folder with caps_ratio feature added
+
+code: .
+command: >
+  python capital_letters_feature.py
+  --data ${{inputs.data}}
+  --out ${{outputs.out}}
+  --text_column ${{inputs.text_column}}
+
+environment: azureml:AzureML-sklearn-1.1-ubuntu20.04-py38-cpu@latest
