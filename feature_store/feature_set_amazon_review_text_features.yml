@@ -1,0 +1,7 @@
+$schema: http://azureml/sdk-2-0/FeatureSet.json
+name: amazon_review_text_features
+version: "1"
+entities:
+  - azureml:AmazonReview:2
+specification:
+  path: .

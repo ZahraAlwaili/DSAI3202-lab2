@@ -1,0 +1,36 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: merge_features
+display_name: Merge All Features
+version: 9
+type: command
+
+inputs:
+  length:
+    type: uri_folder
+  sentiment:
+    type: uri_folder
+  tfidf:
+    type: uri_folder
+  sbert:
+    type: uri_folder
+  capital_letters:
+    type: uri_folder
+
+outputs:
+  out:
+    type: uri_folder
+
+code: .
+
+command: >
+  python merge.py
+  --length ${{inputs.length}}
+  --sentiment ${{inputs.sentiment}}
+  --tfidf ${{inputs.tfidf}}
+  --sbert ${{inputs.sbert}}
+  --capital_letters ${{inputs.capital_letters}}
+  --out ${{outputs.out}}
+
+environment:
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04
+  conda_file: conda.yml

@@ -1,12 +1,10 @@
-name: sentiment_env
+name: merge_env
 channels:
   - conda-forge
   - defaults
 dependencies:
   - python=3.8
   - pandas
-  - scikit-learn
-  - nltk
   - pyarrow
   - pip
   - pip:

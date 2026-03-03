@@ -1,14 +1,19 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
-name: sentiment
-display_name: Sentiment Features
+name: sentiment_analysis
+version: 3
+display_name: Sentiment Analysis
 type: command
+code: .
+command: >-
+  python sentiment.py 
+  --data ${{inputs.data}} 
+  --out ${{outputs.out}}
+environment:
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04
+  conda_file: conda.yml
 inputs:
   data:
     type: uri_folder
 outputs:
   out:
     type: uri_folder
-code: .
-command: >
-  python sentiment.py --data ${{inputs.data}} --out ${{outputs.out}}
-environment: azureml:AzureML-sklearn-1.1-ubuntu20.04-py38-cpu@latest

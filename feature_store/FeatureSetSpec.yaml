@@ -1,0 +1,23 @@
+$schema: http://azureml/sdk-2-0/FeatureSetSpec.json
+
+source:
+  type: mltable 
+  path: azureml://subscriptions/a485bb50-61aa-4b2f-bc7f-b6b53539b9d3/resourcegroups/rg-60307052/workspaces/Amazon-Electronics-Lab-60307052/datastores/workspaceblobstore/paths/azureml/7c0edc71-011b-464d-b41e-31c680e13ffa/out/
+  timestamp_column:
+    name: reviewTime 
+
+index_columns:
+  - name: reviewerID 
+    type: string
+  - name: asin 
+    type: string
+
+features:
+  - name: review_length
+    type: Integer   
+  - name: sentiment_score
+    type: Double     
+  - name: tfidf_features
+    type: String    
+  - name: embeddings
+    type: String     

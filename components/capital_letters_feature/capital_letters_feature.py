@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import os
+import glob
 
 def caps_ratio(text):
     if not isinstance(text, str) or len(text) == 0:
@@ -13,26 +14,32 @@ def caps_ratio(text):
 
 def main():
     parser = argparse.ArgumentParser(description="Capital Letters Ratio Feature")
-    parser.add_argument("--data", type=str, required=True, help="Input data folder containing CSV")
-    parser.add_argument("--out", type=str, required=True, help="Output folder for feature CSV")
-    parser.add_argument("--text_column", type=str, default="review_text", help="Name of text column")
+    parser.add_argument("--data", type=str, required=True, help="Input data folder")
+    parser.add_argument("--out", type=str, required=True, help="Output folder")
+    parser.add_argument("--text_column", type=str, default="reviewText", help="Name of text column")
     args = parser.parse_args()
 
-    # Load input data (assume single CSV in folder)
-    input_files = [f for f in os.listdir(args.data) if f.endswith(".csv")]
+    # Look for Parquet files instead of CSV
+    input_files = glob.glob(os.path.join(args.data, "*.parquet"))
+    
     if not input_files:
-        raise FileNotFoundError("No CSV file found in input data folder.")
-    df = pd.read_csv(os.path.join(args.data, input_files[0]))
+        raise FileNotFoundError(f"No Parquet files found in {args.data}")
+    
+    # Read Parquet
+    df = pd.read_parquet(input_files[0])
 
-    # Compute caps_ratio
-    df["caps_ratio"] = df[args.text_column].fillna("").apply(caps_ratio)
+    # Compute caps_ratio (using reviewText to match your sentiment script)
+    # If your normalization script changes the column name, ensure it matches here
+    target_col = args.text_column if args.text_column in df.columns else "reviewText"
+    df["caps_ratio"] = df[target_col].fillna("").apply(caps_ratio)
 
     # Create output folder
     os.makedirs(args.out, exist_ok=True)
-    output_path = os.path.join(args.out, "data.csv")
-    df.to_csv(output_path, index=False)
+    # Save as Parquet to keep things consistent across the pipeline
+    output_path = os.path.join(args.out, "data.parquet")
+    df.to_parquet(output_path)
+    
     print(f"Caps ratio feature added successfully! Output saved to {output_path}")
 
 if __name__ == "__main__":
     main()
-    

@@ -1,11 +1,9 @@
 $schema: https://azuremlschemas.azureedge.net/latest/featurestoreentity.schema.json
-
 name: AmazonReview
-version: "1"
+version: "2"
 description: Amazon Electronics review entity
-
 index_columns:
-  - name: asin
+  - name: reviewerID 
     type: string
-  - name: reviewerID
+  - name: asin 
     type: string

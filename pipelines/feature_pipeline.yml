@@ -1,16 +1,21 @@
 $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
 compute: azureml:feature-engineering-compute
+experiment_name: DSAI3202-lab2
+
 inputs:
   sampled_data:
     type: uri_folder
-    path: azureml:amazon_electronics_features_v1_sampled@latest
+    path: azureml:amazon_electronics_features_v1_sampled:4  
+
 jobs:
   split:
     type: command
     component: azureml:split_dataset@latest
     inputs:
-      data: ${{parent.inputs.sampled_data}}
+      data: 
+        path: ${{parent.inputs.sampled_data}}
+        mode: download  
 
   normalize_train:
     type: command
@@ -32,29 +37,26 @@ jobs:
 
   length_train:
     type: command
-    component: azureml:length_features@latest
+    component: azureml:review_length@latest
     inputs:
       data: ${{parent.jobs.normalize_train.outputs.out}}
 
   sentiment_train:
     type: command
-    component: azureml:sentiment_features@latest
+    component: azureml:sentiment_analysis:3
     inputs:
       data: ${{parent.jobs.normalize_train.outputs.out}}
-
   tfidf:
     type: command
-    component: azureml:tfidf_features@latest
+    component: azureml:tfidf_features:3
     inputs:
-      train: ${{parent.jobs.normalize_train.outputs.out}}
-      val: ${{parent.jobs.normalize_val.outputs.out}}
-      test: ${{parent.jobs.normalize_test.outputs.out}}
+      data: ${{parent.jobs.normalize_train.outputs.out}}
 
   sbert_train:
     type: command
-    component: azureml:sbert_embeddings@latest
+    component: azureml:semantic_embedding_features:5
     inputs:
-      data: ${{parent.jobs.normalize_train.outputs.out}}
+      input_data: ${{parent.jobs.normalize_train.outputs.out}}
 
   capital_letters_train:
     type: command
@@ -65,10 +67,13 @@ jobs:
 
   merge_all:
     type: command
-    component: azureml:merge_features@latest
+    component: azureml:merge_features:9
     inputs:
       length: ${{parent.jobs.length_train.outputs.out}}
       sentiment: ${{parent.jobs.sentiment_train.outputs.out}}
-      tfidf: ${{parent.jobs.tfidf.outputs.train_out}}
-      sbert: ${{parent.jobs.sbert_train.outputs.out}}
+      tfidf: ${{parent.jobs.tfidf.outputs.out}}
+      sbert: ${{parent.jobs.sbert_train.outputs.output_data}}
       capital_letters: ${{parent.jobs.capital_letters_train.outputs.out}}
+    outputs:
+      out:
+        type: uri_folder
