@@ -14,10 +14,12 @@ index_columns:
 
 features:
   - name: review_length
-    type: Integer   
+    type: Integer
   - name: sentiment_score
-    type: Double     
+    type: Double
   - name: tfidf_features
-    type: String    
+    type: String
   - name: embeddings
-    type: String     
+    type: String
+  - name: capital_letters_ratio
+    type: Double
