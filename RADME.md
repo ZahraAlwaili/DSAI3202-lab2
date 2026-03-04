@@ -13,6 +13,7 @@ Drift Resistance: The sampling strategy ensures a diverse representation of revi
 
 ## III. Azure ML Feature Engineering Pipeline
 The pipeline is built using Azure ML Command Components, ensuring a modular and reproducible workflow. Each step is tracked, and components run on dedicated Azure ML compute clusters.
+<img width="1638" height="804" alt="image" src="https://github.com/user-attachments/assets/2c884906-cd13-428f-8178-289d829f93f8" />
 
 ### Feature Engineering Components
 Split Dataset: Performs a 70/15/15 (Train/Val/Test) split to prevent data leakage.
@@ -27,7 +28,7 @@ TF-IDF: Captures term importance using N-grams (1,2) to represent word frequency
 
 SBERT Embeddings: Generates dense semantic vectors using transformer-based models to capture deep contextual meaning.
 
-Capital Letters Ratio: Measures the proportion of uppercase characters. This serves as a proxy for "intensity" or "shouting," providing signal that standard lowercase normalization might miss.
+Capital Letters Ratio: Measures the proportion of uppercase characters. This serves as a proxy for "intensity" or "shouting," providing signal that standard lowercase normalization might miss. "Bonus"
 
 ## IV. Feature Store Registration & Versioning
 The final output is registered in the Azure ML Feature Store, decoupling data engineering from model training.
@@ -48,8 +49,8 @@ Version 2: (Current) Integrated the Capital Letters Ratio feature and updated th
 
 ## V. CLI Verification
 Success was verified using the Azure CLI. The following command confirms that Version 2 is live with all features registered:
+<img width="1520" height="352" alt="image" src="https://github.com/user-attachments/assets/cb150b37-bac7-4035-bd71-6d748057af1e" />
+<img width="1260" height="564" alt="image" src="https://github.com/user-attachments/assets/39c02d0c-3f3a-4351-986a-f576d52ea2f6" />
 
-PowerShell
-az ml feature-set show --name amazon_review_text_features --version 2 --resource-group rg-60307052 --feature-store-name amazon-electronics-fs-60307052
 ## VI. Words of Affirmation
 "The code worked, the JSON returned, and the cloud obeyed."
