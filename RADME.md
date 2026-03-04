@@ -71,10 +71,8 @@ Version 1: Initial feature set including Length, Sentiment, and TF-IDF.
 
 Version 2: Successfully evolved the schema to include the Capital Letters Ratio.
 
-Verification:
 
-PowerShell
-az ml feature-set show --name amazon_review_text_features --version 2 --resource-group rg-60307052 --feature-store-name amazon-electronics-fs-60307052
+
 ## Reflection
 Building this pipeline highlighted that data engineering is 80% of the work in ML. By implementing drift-resistant sampling and a leakage-proof split strategy, the resulting 500+ features are not just numerous, but reliable. Using a Feature Store for Version 2 registration proved how essential versioning is—allowing for feature iteration (adding the Capital Ratio) without breaking the existing Version 1 dependencies.
 
