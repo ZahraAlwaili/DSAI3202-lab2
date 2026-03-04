@@ -79,5 +79,3 @@ Building this pipeline highlighted that data engineering is 80% of the work in M
 <img width="1520" height="352" alt="image" src="https://github.com/user-attachments/assets/cb150b37-bac7-4035-bd71-6d748057af1e" />
 <img width="1260" height="564" alt="image" src="https://github.com/user-attachments/assets/39c02d0c-3f3a-4351-986a-f576d52ea2f6" />
 
-## VI. Words of Affirmation
-"The code worked, the JSON returned, and the cloud obeyed."
