@@ -1,54 +1,83 @@
-## Lab 4: Text Feature Engineering & Azure ML Feature Store
-## I. Introduction
-This project implements a production-grade feature engineering pipeline using Azure Machine Learning. We have transformed the raw Amazon Electronics reviews dataset into a versioned, multi-dimensional feature set. By moving from raw text to numerical representations, we have prepared the data for high-performance machine learning models.
+## Lab 4: Advanced Text Feature Engineering & Azure ML Feature Store
+## Overview
+This lab implements a production-grade feature engineering pipeline using Azure Machine Learning to transform 300,000+ raw Amazon Electronics reviews into high-signal numerical features. The pipeline automates the extraction of structural metadata, emotional polarity, and semantic context, culminating in a versioned Feature Set registered within the Azure ML Feature Store.
 
-## II. Exploration, Validation, and Sampling
-Before building the pipeline, we conducted an initial validation in Databricks:
+## Dataset Exploration & Validation
+Before pipeline execution, data integrity was verified using Azure Databricks to ensure the "Gold" layer was suitable for high-dimensional feature extraction.
 
-Schema Verification: Confirmed reviewText is stored as strings and overall ratings are numeric.
+Schema Enforcement: Confirmed reviewText (String) and overall (Numeric) types to prevent pipeline crashes during vectorization.
 
-Sampling for Scale: Created a sampled subset of 300,000 reviews to balance feature richness with computational efficiency.
+Data Quality: Identified and handled missing values in the composite keys (asin, reviewerID).
 
-Drift Resistance: The sampling strategy ensures a diverse representation of reviews to remain resistant to language evolution and temporal drift.
+Visualizations:
 
-## III. Azure ML Feature Engineering Pipeline
-The pipeline is built using Azure ML Command Components, ensuring a modular and reproducible workflow. Each step is tracked, and components run on dedicated Azure ML compute clusters.
+Rating Distribution: Observed a heavy skew toward 5-star ratings (~17M reviews), identifying a class imbalance that will require weighting in future modeling.
+
+Review Length Distribution: Analyzed character counts to determine optimal padding for transformer models, noting a "long tail" of reviews exceeding 10,000 characters.
+
+## Drift-Resistant Sampling
+Problem: Random sampling from a 20-year dataset (1996-2018) risks over-representing recent years where review volume is higher, leading to "Language Drift" where models fail on older linguistic patterns.
+Solution: Implemented Stratified Sampling by year. By ensuring equal representation across the 1999–2014 timespan, the features remain robust against evolving slang and product categories.
+
+## Feature Engineering Components
+Each component is a modular Python script wrapped in a component.yml definition, running on isolated Azure ML compute clusters.
+
+### 1. Split Dataset Component
+Purpose: The most critical step for model integrity—preventing data leakage.
+
+Logic: Implemented a two-stage split (70% Train, 15% Val, 15% Test).
+
+Why? Splitting before any feature fitting (like TF-IDF or Scaling) ensures that the validation and test sets remain "unseen" by the feature extractors.
+
+### 2. Normalize Text Component
+Logic: Applied standard regex patterns via the re library to lowercase text, remove noise (URLs, HTML tags, numbers), and strip punctuation.
+
+Consistency: The same normalization logic is applied in parallel to all three splits to ensure the data distribution remains identical during inference.
+
+### 3. Metadata & Intensity Features
+Review Length: Created review_length_words and review_length_chars to capture reviewer engagement levels.
+
+Capital Letters Ratio (V2 Update): Added in Version 2, this feature calculates the ratio of uppercase characters.
+
+Significance: This captures "Reviewer Intensity" (e.g., shouting in all caps), a nuanced signal often lost when text is lowercased during standard NLP normalization.
+
+### 4. Sentiment Features (VADER)
+Logic: Utilized the VADER (Valence Aware Dictionary and sEntiment Reasoner).
+
+Output: Generated pos, neg, neu, and compound scores.
+
+Why VADER? Unlike basic polarity, VADER is specifically tuned for social media and product reviews, handling emojis, intensifiers ("very good!"), and negations ("not bad").
+
+### 5. TF-IDF & Semantic Embeddings
+TF-IDF: Extracted top 100 n-grams (1,2). This provides statistical word importance while bigrams capture local context (e.g., "not great").
+
+SBERT Embeddings: Used the all-MiniLM-L6-v2 transformer model to generate 384-dimensional dense vectors.
+
+Why both? TF-IDF captures specific keyword importance (lexical), while BERT captures the "meaning" behind the words (semantic), allowing the model to understand that "excellent" and "superb" are related.
+
+## Pipeline & Feature Store Registration
+### Pipeline Execution
+The pipeline wires these components into a Directed Acyclic Graph (DAG).
+
+Command: az ml job create --file pipelines/feature_pipeline.yml
+
+Optimization: Feature extraction components (Length, Sentiment, TF-IDF, BERT) run in parallel to minimize total execution time.
 <img width="1638" height="804" alt="image" src="https://github.com/user-attachments/assets/2c884906-cd13-428f-8178-289d829f93f8" />
 
-### Feature Engineering Components
-Split Dataset: Performs a 70/15/15 (Train/Val/Test) split to prevent data leakage.
+### Feature Store Versioning (Schema Evolution)
+Registration was performed using the Azure ML CLI to create a governed, searchable asset.
 
-Normalize Text: Cleans reviews by removing URLs, punctuation, and converting to lowercase for specific NLP tasks.
+Version 1: Initial feature set including Length, Sentiment, and TF-IDF.
 
-Review Length: Calculates word and character counts to capture the level of detail provided by the reviewer.
+Version 2: Successfully evolved the schema to include the Capital Letters Ratio.
 
-Sentiment Analysis: Uses VADER to extract Pos/Neg/Neu and Compound polarity scores.
+Verification:
 
-TF-IDF: Captures term importance using N-grams (1,2) to represent word frequency and relevance.
+PowerShell
+az ml feature-set show --name amazon_review_text_features --version 2 --resource-group rg-60307052 --feature-store-name amazon-electronics-fs-60307052
+## Reflection
+Building this pipeline highlighted that data engineering is 80% of the work in ML. By implementing drift-resistant sampling and a leakage-proof split strategy, the resulting 500+ features are not just numerous, but reliable. Using a Feature Store for Version 2 registration proved how essential versioning is—allowing for feature iteration (adding the Capital Ratio) without breaking the existing Version 1 dependencies.
 
-SBERT Embeddings: Generates dense semantic vectors using transformer-based models to capture deep contextual meaning.
-
-Capital Letters Ratio: Measures the proportion of uppercase characters. This serves as a proxy for "intensity" or "shouting," providing signal that standard lowercase normalization might miss. "Bonus"
-
-## IV. Feature Store Registration & Versioning
-The final output is registered in the Azure ML Feature Store, decoupling data engineering from model training.
-
-### Entity Definition
-Name: AmazonReview
-
-Index Columns: reviewerID, asin (Composite Key)
-
-Version: 2
-
-### Schema Evolution (Versioning)
-We utilized a versioning strategy to iterate on our feature set:
-
-Version 1: Initial feature set including length, sentiment, TF-IDF, and SBERT.
-
-Version 2: (Current) Integrated the Capital Letters Ratio feature and updated the Feature Set Specification to reflect the expanded schema.
-
-## V. CLI Verification
-Success was verified using the Azure CLI. The following command confirms that Version 2 is live with all features registered:
 <img width="1520" height="352" alt="image" src="https://github.com/user-attachments/assets/cb150b37-bac7-4035-bd71-6d748057af1e" />
 <img width="1260" height="564" alt="image" src="https://github.com/user-attachments/assets/39c02d0c-3f3a-4351-986a-f576d52ea2f6" />
 
