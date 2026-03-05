@@ -69,7 +69,7 @@ All components are connected in a Directed Acyclic Graph (DAG).
 
 Feature extraction steps (Length, Sentiment, TF-IDF, BERT) run in parallel, reducing total execution time.
 ### Reflection
-working on this lab I discoverd how oreparing the data is the moat important atep in the ML workflow, and the pipeline gave me a deeper understanding of the workflow and how to prevent data leakage or data drift over time. 
+working on this lab I discoverd how preparing the data can be the moat crucial step in the ML workflow to achive a high quality model, and the pipeline gave me a deeper understanding of the workflow and how to prevent data leakage or data drift over time. 
 
 Finally, using the pipeline and registering features in the Azure ML Feature Store shows  how important reproducibility and versioning are in real-world ML projects.Instead of manual building and managing the features every time, the pipeline ensures that exactly the same steps are consistently applied with every ingestion, which makes experimentation easier and the workflow more reliable.
 
