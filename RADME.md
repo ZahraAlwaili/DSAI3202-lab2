@@ -4,7 +4,7 @@
 This lab builds a high-level feature engineering pipeline using Azure Machine Learning to transform more than 300,000 Amazon Electronics reviews into numerical features. The pipeline extracts metadata, sentiment, and semantic context, then registers the results as a versioned Feature Set in the Azure ML Feature Store,this lab is critical to learn how to automate feature engineering workflow which makes the whole proccess reproducible and scalable.
 
 ### Dataset Exploration & Validation
-Before running the pipeline, the dataset was validated in Azure Databricks to ensure the daya is suitable for feature extraction.
+Before running the pipeline, the dataset was validated in Azure Databricks to ensure the data is suitable for feature extraction.
 
 **Schema Enforcement:** Verified correct data types for `reviewText` (String) and `overall` (Numeric) to prevent errors during vectorization or model fitting .
 
