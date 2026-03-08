@@ -6,6 +6,9 @@ This lab builds a high-level feature engineering pipeline using Azure Machine Le
 ### Dataset Exploration & Validation
 Before running the pipeline, the dataset was validated in Azure Databricks to ensure the data is suitable for feature extraction.
 
+<img width="541" height="479" alt="image" src="https://github.com/user-attachments/assets/a2fa5d80-5fa8-411b-bbcd-b9d79b8388a4" />
+<img width="548" height="725" alt="image" src="https://github.com/user-attachments/assets/28d8dc3d-db56-4fa9-a7ff-3a85d6166faf" />
+
 **Schema Enforcement:** Verified correct data types for `reviewText` (String) and `overall` (Numeric) to prevent errors during vectorization or model fitting .
 
 **Data Quality:** Checked and handled missing values in the composite keys (`asin`, `reviewerID`)as they are used to identify the products and might break the proccess.
