@@ -1,0 +1,56 @@
+{
+  "lab": "Lab 5 - Predictive Maintenance",
+  "dataset": "NASA C-MAPSS FD001",
+  "timestamp": "2026-03-10T14:36:34.888327",
+  "pipeline_steps": {
+    "1_data_loading": "\u2705 train(20631) test(13096) RUL(100)",
+    "2_preprocessing": "\u2705 Raw\u2192Silver\u2192Gold | dropped 7 sensors",
+    "3_tsfresh_extraction": "\u2705 140 features | 1.4 min (MinimalFCParameters)",
+    "4_filter_selection": "\u2705 140\u2192121\u219247 features (Variance+Corr+MI)",
+    "5_genetic_algorithm": "\u2705 47\u219217 features | 0.6 min | 10 gen pop=20",
+    "6_model_training": "\u2705 XGBoost 300 estimators | 80s"
+  },
+  "results": {
+    "XGBoost": {
+      "rmse": 46.278,
+      "mae": 35.062,
+      "r2": 0.384
+    },
+    "LightGBM": {
+      "rmse": 46.549,
+      "mae": 35.631,
+      "r2": 0.377
+    },
+    "RF_Tuned": {
+      "rmse": 47.454,
+      "mae": 36.076,
+      "r2": 0.353
+    },
+    "RandomForest": {
+      "rmse": 47.605,
+      "mae": 36.242,
+      "r2": 0.348
+    }
+  },
+  "best_model": {
+    "name": "XGBoost",
+    "rmse": 46.278,
+    "mae": 35.062,
+    "r2": 0.384,
+    "features": 17
+  },
+  "runtime_summary": {
+    "tsfresh_train_min": 1.4,
+    "filter_selection_min": 0.5,
+    "ga_selection_min": 0.6,
+    "model_training_sec": 80.2,
+    "tsfresh_test_min": 0.8,
+    "total_min": 5.0
+  },
+  "feature_reduction": {
+    "raw_features": 140,
+    "after_filter": 47,
+    "after_ga": 17,
+    "reduction_pct": "87.8%"
+  }
+}
