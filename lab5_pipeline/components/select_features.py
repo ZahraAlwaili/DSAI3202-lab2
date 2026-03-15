@@ -107,7 +107,7 @@ def main():
     X_test_final["RUL"] = y_test.values
     X_test_final.to_parquet(f"{args.output_path}/test_final.parquet", index=False)
 
-    # حفظ أسماء الـ features المختارة
+    # save selected features name
     pd.Series(selected_cols).to_csv(
         f"{args.output_path}/selected_features.csv", index=False)
 

@@ -7,29 +7,39 @@ from azure.identity import DefaultAzureCredential
 # ── Connect to Workspace ─────────────────────────────────
 ml_client = MLClient(
     credential=DefaultAzureCredential(),
-    subscription_id="UDST-CCIT-DSAI3202-1",
+    subscription_id="a485bb50-61aa-4b2f-bc7f-b6b53539b9d3",
     resource_group_name="rg-60307052",
-    workspace_name="amazon-electronics-fs-60307052"
+    workspace_name="Amazon-Electronics-Lab-60307052"
 )
 print(f"✅ Connected to: {ml_client.workspace_name}")
 
 # ── Environment ──────────────────────────────────────────
+from azure.ai.ml.entities import Environment, BuildContext
+
 env = Environment(
     name="lab5-env",
-    conda_file=None,
     image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
-    pip_packages=[
-        "azure-storage-blob",
-        "pandas",
-        "scikit-learn",
-        "tsfresh",
-        "deap",
-        "xgboost",
-        "lightgbm",
-        "pyarrow"
-    ]
+    conda_file={
+        "name": "lab5-env",
+        "channels": ["defaults"],
+        "dependencies": [
+            "python=3.10",
+            "pip",
+            {
+                "pip": [
+                    "azure-storage-blob",
+                    "pandas",
+                    "scikit-learn",
+                    "tsfresh",
+                    "deap",
+                    "xgboost",
+                    "lightgbm",
+                    "pyarrow"
+                ]
+            }
+        ]
+    }
 )
-
 # ── Components ───────────────────────────────────────────
 preprocess_component = CommandComponent(
     name="preprocess",
@@ -44,7 +54,7 @@ preprocess_component = CommandComponent(
     inputs={"account_key": {"type": "string", "is_optional": False}},
     outputs={"output_path": {"type": "uri_folder"}},
     environment=env,
-    code="."
+    code="./lab5_pipeline"
 )
 
 extract_component = CommandComponent(
@@ -59,7 +69,7 @@ extract_component = CommandComponent(
     inputs={"input_path": {"type": "uri_folder"}},
     outputs={"output_path": {"type": "uri_folder"}},
     environment=env,
-    code="."
+    code="./lab5_pipeline"
 )
 
 select_component = CommandComponent(
@@ -73,7 +83,7 @@ select_component = CommandComponent(
     inputs={"input_path": {"type": "uri_folder"}},
     outputs={"output_path": {"type": "uri_folder"}},
     environment=env,
-    code="."
+    code="./lab5_pipeline"
 )
 
 train_component = CommandComponent(
@@ -87,7 +97,7 @@ train_component = CommandComponent(
     inputs={"input_path": {"type": "uri_folder"}},
     outputs={"output_path": {"type": "uri_folder"}},
     environment=env,
-    code="."
+    code="./lab5_pipeline"
 )
 
 # ── Pipeline ─────────────────────────────────────────────
@@ -104,7 +114,7 @@ def lab5_pipeline(account_key: str):
 
 # ── Submit ───────────────────────────────────────────────
 if __name__ == "__main__":
-    ACCOUNT_KEY = "rbXHUr9voqcrJI5eLoNEFzc4ULCNRK1qI7Ogtmh2gQrGGkLnR9uDGTEN2txtGTxC43EZpQKwse9K+AStPfT+KA=="   # ← ضع الـ Key
+    ACCOUNT_KEY = "rbXHUr9voqcrJI5eLoNEFzc4ULCNRK1qI7Ogtmh2gQrGGkLnR9uDGTEN2txtGTxC43EZpQKwse9K+AStPfT+KA=="   
 
     pipeline_job = lab5_pipeline(account_key=ACCOUNT_KEY)
     pipeline_job.settings.default_compute = "serverless"
