@@ -252,7 +252,7 @@ py lab5_pipeline/pipeline.py
 
 ### Config
 ```python
-STORAGE_ACCOUNT = "your_storage_account"
+STORAGE_ACCOUNT = "amazondatalake60307052"
 ACCOUNT_KEY     = "your_key"         
 CONTAINER       = "lab5"
 WINDOW_SIZE     = 30
