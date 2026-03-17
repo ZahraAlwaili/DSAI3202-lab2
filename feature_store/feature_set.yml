@@ -1,0 +1,8 @@
+﻿$schema: https://azuremlschemas.azureedge.net/latest/featureset.schema.json
+name: engine_rul_features
+version: "1"
+description: RUL prediction features for NASA C-MAPSS FD001
+entities:
+  - azureml:EngineEntity:1
+specification:
+  path: spec/

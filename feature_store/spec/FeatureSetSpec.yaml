@@ -1,0 +1,11 @@
+﻿source:
+  type: parquet
+  path: azureml://subscriptions/a485bb50-61aa-4b2f-bc7f-b6b53539b9d3/resourcegroups/rg-60307052/workspaces/Amazon-Electronics-Lab-60307052/datastores/workspaceblobstore/paths/azureml/5d26e42c-4eaa-4480-ab34-7cc97ff4a509/output_path/
+  timestamp_column:
+    name: cycle
+index_columns:
+  - name: engine_id
+    type: integer
+features:
+  - name: RUL
+    type: float
