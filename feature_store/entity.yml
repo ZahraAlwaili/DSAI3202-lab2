@@ -1,0 +1,7 @@
+﻿$schema: https://azuremlschemas.azureedge.net/latest/featurestoreentity.schema.json
+name: EngineEntity
+version: "1"
+description: NASA C-MAPSS turbofan engine entity
+index_columns:
+  - name: engine_id
+    type: integer
