@@ -176,6 +176,10 @@ The Pipeline achieved significantly better results due to:
 - RUL Clipping at 125 (focused model on degradation phase)
 - Step size of 5 (increased data diversity)
 
+
+<img width="440" height="615" alt="image" src="https://github.com/user-attachments/assets/2154c08a-500c-4b4e-b47e-076c2295556f" />
+<img width="1217" height="620" alt="image" src="https://github.com/user-attachments/assets/31d8a9d1-0ade-43a9-bed9-f08bbdb9f312" />
+
 ---
 
 ## Part 3 – Azure ML Feature Store
@@ -249,7 +253,7 @@ py lab5_pipeline/pipeline.py
 ### Config
 ```python
 STORAGE_ACCOUNT = "your_storage_account"
-ACCOUNT_KEY     = "your_key"           # never commit this!
+ACCOUNT_KEY     = "your_key"         
 CONTAINER       = "lab5"
 WINDOW_SIZE     = 30
 STEP_SIZE       = 5
