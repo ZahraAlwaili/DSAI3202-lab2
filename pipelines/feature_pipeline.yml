@@ -1,62 +1,76 @@
 $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
-compute: azureml:feature-engineering-compute
+display_name: Full Feature Engineering Pipeline Lab 2
 experiment_name: DSAI3202-lab2
+compute: azureml:feature-engineering-compute
 
 inputs:
   sampled_data:
     type: uri_folder
-    path: azureml:amazon_electronics_features_v1_sampled:4  
+    # Using Datastore URI to use your Account Key
+    path: azureml://datastores/adls_datastore/paths/features_v1_sampled/
+    # FORCE DOWNLOAD to bypass 'StreamAccess' authentication errors
+    mode: download 
 
 jobs:
   split:
     type: command
-    component: azureml:split_dataset@latest
+    component: azureml:split_dataset:14
     inputs:
-      data: 
-        path: ${{parent.inputs.sampled_data}}
-        mode: download  
-
+      data: ${{parent.inputs.sampled_data}}
+    outputs:
+      train:
+        type: uri_folder
+      val:
+        type: uri_folder
+      test:
+        type: uri_folder
+      deployment:
+        type: uri_folder
   normalize_train:
     type: command
     component: azureml:normalize_text@latest
     inputs:
       data: ${{parent.jobs.split.outputs.train}}
-
-  normalize_val:
-    type: command
-    component: azureml:normalize_text@latest
-    inputs:
-      data: ${{parent.jobs.split.outputs.val}}
-
-  normalize_test:
-    type: command
-    component: azureml:normalize_text@latest
-    inputs:
-      data: ${{parent.jobs.split.outputs.test}}
+    outputs:
+      out:
+        type: uri_folder
 
   length_train:
     type: command
     component: azureml:review_length@latest
     inputs:
       data: ${{parent.jobs.normalize_train.outputs.out}}
+    outputs:
+      out:
+        type: uri_folder
 
   sentiment_train:
     type: command
     component: azureml:sentiment_analysis:3
     inputs:
       data: ${{parent.jobs.normalize_train.outputs.out}}
+    outputs:
+      out:
+        type: uri_folder
+
   tfidf:
     type: command
     component: azureml:tfidf_features:3
     inputs:
       data: ${{parent.jobs.normalize_train.outputs.out}}
+    outputs:
+      out:
+        type: uri_folder
 
   sbert_train:
     type: command
     component: azureml:semantic_embedding_features:5
     inputs:
       input_data: ${{parent.jobs.normalize_train.outputs.out}}
+    outputs:
+      output_data:
+        type: uri_folder
 
   capital_letters_train:
     type: command
@@ -64,16 +78,37 @@ jobs:
     inputs:
       data: ${{parent.jobs.normalize_train.outputs.out}}
       text_column: "review_text"
+    outputs:
+      out:
+        type: uri_folder
 
   merge_all:
     type: command
-    component: azureml:merge_features:9
+    component: azureml:merge_features:11
     inputs:
       length: ${{parent.jobs.length_train.outputs.out}}
       sentiment: ${{parent.jobs.sentiment_train.outputs.out}}
       tfidf: ${{parent.jobs.tfidf.outputs.out}}
       sbert: ${{parent.jobs.sbert_train.outputs.output_data}}
       capital_letters: ${{parent.jobs.capital_letters_train.outputs.out}}
+    outputs:
+      out:
+        type: uri_folder
+
+  normalize_val:
+    type: command
+    component: azureml:normalize_text@latest
+    inputs:
+      data: ${{parent.jobs.split.outputs.val}}
+    outputs:
+      out:
+        type: uri_folder
+
+  normalize_test:
+    type: command
+    component: azureml:normalize_text@latest
+    inputs:
+      data: ${{parent.jobs.split.outputs.test}}
     outputs:
       out:
         type: uri_folder

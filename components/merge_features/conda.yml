@@ -6,6 +6,7 @@ dependencies:
   - python=3.8
   - pandas
   - pyarrow
+  - scikit-learn
   - pip
   - pip:
       - azureml-mlflow

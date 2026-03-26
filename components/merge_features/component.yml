@@ -1,7 +1,7 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
 name: merge_features
-display_name: Merge All Features
-version: 9
+display_name: Merge All Features and Split
+version: 11
 type: command
 
 inputs:
@@ -23,12 +23,12 @@ outputs:
 code: .
 
 command: >
-  python merge.py
-  --length ${{inputs.length}}
-  --sentiment ${{inputs.sentiment}}
-  --tfidf ${{inputs.tfidf}}
-  --sbert ${{inputs.sbert}}
-  --capital_letters ${{inputs.capital_letters}}
+  python merge.py 
+  --length ${{inputs.length}} 
+  --sentiment ${{inputs.sentiment}} 
+  --tfidf ${{inputs.tfidf}} 
+  --sbert ${{inputs.sbert}} 
+  --capital_letters ${{inputs.capital_letters}} 
   --out ${{outputs.out}}
 
 environment:

@@ -1,4 +1,4 @@
-$schema: http://azureml/sdk-2-0/FeatureSetSpec.json
+﻿$schema: http://azureml/sdk-2-0/FeatureSetSpec.json
 
 source:
   type: mltable 
