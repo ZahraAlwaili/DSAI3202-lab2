@@ -1,0 +1,12 @@
+name: amazon_training_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip:
+    - mlflow
+    - azureml-mlflow
+    - pandas
+    - scikit-learn
+    - pyarrow
+    - joblib
