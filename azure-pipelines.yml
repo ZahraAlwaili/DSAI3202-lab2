@@ -1,0 +1,42 @@
+trigger:
+  branches:
+    include:
+      - assignment2_model_training  # Your current working branch
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  # This must match the Service Connection name in your Project Settings
+  AZURE_SUBSCRIPTION: 'SC-UDST-CCIT-DSAI3202-1' 
+  RESOURCE_GROUP: 'rg-60307052'
+  WORKSPACE_NAME: 'Amazon-Electronics-Lab-60307052'
+
+steps:
+- checkout: self
+
+- task: AzureCLI@2
+  displayName: "Submit Azure ML Training Job"
+  inputs:
+    azureSubscription: $(AZURE_SUBSCRIPTION)
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e 
+
+      echo "Updating Azure ML extension..."
+      az extension add -n ml -y || az extension update -n ml 
+
+      echo "Setting defaults for $(WORKSPACE_NAME)..."
+      az configure --defaults \
+        group=$(RESOURCE_GROUP) \
+        workspace=$(WORKSPACE_NAME) 
+
+      echo "Submitting training job..."
+      # This command starts the job and gets its unique name
+      JOB_NAME=$(az ml job create --file jobs/train_job.yml --query name -o tsv) 
+
+      echo "Job successfully submitted: $JOB_NAME" 
+
+      echo "Streaming logs to DevOps console..."
+      az ml job stream --name $JOB_NAME
