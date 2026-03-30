@@ -1,5 +1,7 @@
 $schema: https://azuremlschemas.azureedge.net/latest/sweepJob.schema.json
 type: sweep
+display_name: Amazon_Review_Sweep_Final  
+experiment_name: DSAI3202-lab2
 trial:
   code: ../src
   command: >-
