@@ -70,7 +70,7 @@ def parse_args():
     parser.add_argument("--output", type=str, required=True)
     
     # Hyperparameters for Tuning
-    parser.add_argument("--C", type=float, default=1.0)
+    parser.add_argument("--C", type=float, default=10.0)
     parser.add_argument("--solver", type=str, default='liblinear')
     
     return parser.parse_args()
