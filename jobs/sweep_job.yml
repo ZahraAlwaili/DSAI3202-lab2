@@ -1,0 +1,45 @@
+$schema: https://azuremlschemas.azureedge.net/latest/sweepJob.schema.json
+type: sweep
+job:
+  type: command
+  code: ../src
+  command: >-
+    python train.py 
+    --train_data ${{inputs.train_data}} 
+    --val_data ${{inputs.val_data}} 
+    --test_data ${{inputs.test_data}} 
+    --output ${{outputs.output}}
+    --C ${{inputs.C}}
+    --solver ${{inputs.solver}}
+  inputs:
+    # These point to your existing Azure ML Data Assets
+    train_data: 
+      type: uri_folder
+      path: azureml:amazon_train_data:1
+    val_data: 
+      type: uri_folder
+      path: azureml:amazon_val_data:1
+    test_data: 
+      type: uri_folder
+      path: azureml:amazon_test_data:1
+    # SWEEP SEARCH SPACE
+    C:
+      type: log_uniform
+      min_value: -5.0 # This results in 10^-5
+      max_value: 2.0  # This results in 10^2
+    solver:
+      type: choice
+      values: ['liblinear', 'saga']
+  outputs:
+    output:
+      type: uri_folder
+  environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu@latest
+  compute: azureml:feature-engineering-compute
+
+sampling_algorithm: random
+objective:
+  goal: maximize
+  primary_metric: test_accuracy
+limits:
+  max_total_trials: 10
+  max_concurrent_trials: 2

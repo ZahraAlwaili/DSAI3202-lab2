@@ -15,15 +15,6 @@ from sklearn.metrics import (
     recall_score, 
     f1_score
 )
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--train_data", type=str, required=True)
-    parser.add_argument("--val_data", type=str, required=True)
-    parser.add_argument("--test_data", type=str, required=True)
-    parser.add_argument("--output", type=str, required=True)
-    return parser.parse_args()
-
 def load_data(path):
     # Divine Intervention: Points to the folder, reads the parquet inside
     parquet_path = os.path.join(path, "data.parquet")
@@ -72,13 +63,33 @@ def evaluate_and_log(model, X, y, split):
         mlflow.log_metric(name, value)
         print(f"{name}: {value:.4f}")
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    # Data paths
+    parser.add_argument("--train_data", type=str, required=True)
+    parser.add_argument("--val_data", type=str, required=True)
+    parser.add_argument("--test_data", type=str, required=True)
+    parser.add_argument("--output", type=str, required=True)
+    
+    # NEW: Hyperparameters for Tuning
+    # 'C' is the inverse of regularization strength; smaller values = stronger regularization.
+    parser.add_argument("--C", type=float, default=1.0)
+    # 'solver' is the algorithm used for optimization.
+    parser.add_argument("--solver", type=str, default='liblinear')
+    
+    return parser.parse_args()
+
 def main():
     args = parse_args()
     
     # Start MLflow Run
     mlflow.start_run()
     
-    # CHALLENGE: Start precise timer
+    # NEW: Log hyperparameters to MLflow so they appear in the Sweep results
+    mlflow.log_param("C", args.C)
+    mlflow.log_param("solver", args.solver)
+    
+    # Start precise timer
     start_time = time.time()
 
     print("Loading datasets...")
@@ -95,11 +106,14 @@ def main():
     X_test = build_features(test_df)
     y_test = test_df["label"]
 
-    print(f"Training Model on {X_train.shape[1]} features...")
+    print(f"Training Model with C={args.C}, solver={args.solver} on {X_train.shape[1]} features...")
     
-    # Section C: Model Choice. 
-    # Using LogisticRegression with 'liblinear' or 'saga' for efficiency.
-    model = LogisticRegression(max_iter=1000, solver='liblinear')
+    # UPDATED: LogisticRegression now uses the arguments passed by the Sweep Job
+    model = LogisticRegression(
+        C=args.C, 
+        solver=args.solver, 
+        max_iter=1000
+    )
     model.fit(X_train, y_train)
 
     print("Logging all metrics...")
@@ -107,7 +121,7 @@ def main():
     evaluate_and_log(model, X_val, y_val, "val")
     evaluate_and_log(model, X_test, y_test, "test")
 
-    # CHALLENGE: End timer and log runtime
+    # End timer and log runtime
     total_runtime = time.time() - start_time
     mlflow.log_metric("total_training_runtime_seconds", total_runtime)
     print(f"Total Runtime: {total_runtime:.2f}s")
@@ -117,6 +131,7 @@ def main():
     joblib.dump(model, os.path.join(args.output, "model.pkl"))
     
     mlflow.end_run()
-
+    
+    
 if __name__ == "__main__":
     main()
