@@ -18,6 +18,6 @@ inputs:
     type: uri_folder
     path: azureml:amazon_review_merged_features_test:5
 environment: azureml:amazon_review_training_env:1
-compute: azureml:Amazon-Lab-compute
+compute: azureml:feature-engineering-compute
 display_name: amazon-sentiment-training
 experiment_name: assignment2-training
