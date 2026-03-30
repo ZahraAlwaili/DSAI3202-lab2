@@ -12,21 +12,21 @@ job:
     --C ${{inputs.C}}
     --solver ${{inputs.solver}}
   inputs:
-    # These point to your existing Azure ML Data Assets
+    # Use your actual Version 5 Data Assets
     train_data: 
       type: uri_folder
-      path: azureml:amazon_train_data:1
+      path: azureml:amazon_review_merged_features_train:5
     val_data: 
       type: uri_folder
-      path: azureml:amazon_val_data:1
+      path: azureml:amazon_review_merged_features_val:5
     test_data: 
       type: uri_folder
-      path: azureml:amazon_test_data:1
+      path: azureml:amazon_review_merged_features_test:5
     # SWEEP SEARCH SPACE
     C:
       type: log_uniform
-      min_value: -5.0 # This results in 10^-5
-      max_value: 2.0  # This results in 10^2
+      min_value: -5.0 
+      max_value: 2.0  
     solver:
       type: choice
       values: ['liblinear', 'saga']
