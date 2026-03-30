@@ -39,7 +39,7 @@ compute: azureml:feature-engineering-compute
 sampling_algorithm: random
 objective:
   goal: maximize
-  primary_metric: test_accuracy
+  primary_metric: val_accuracy
 limits:
   max_total_trials: 10
   max_concurrent_trials: 2

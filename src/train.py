@@ -15,6 +15,7 @@ from sklearn.metrics import (
     recall_score, 
     f1_score
 )
+
 def load_data(path):
     # Divine Intervention: Points to the folder, reads the parquet inside
     parquet_path = os.path.join(path, "data.parquet")
@@ -25,32 +26,29 @@ def create_labels(df):
     df["label"] = (df["overall"] >= 4).astype(int)
     return df
 
-
 def build_features(df):
     # 1. Drop targets and IDs
     to_drop = ['asin', 'reviewerID', 'overall', 'label']
     X = df.drop(columns=[c for c in to_drop if c in df.columns])
     
-    # 2. Keep ONLY numeric columns (SBERT, TF-IDF, etc.)
+    # 2. Keep ONLY numeric columns
     X = X.select_dtypes(include=[np.number])
     
-    # 3. DIVINE INTERVENTION: Handle NaNs
-    # Filling with 0 is fast and prevents the LogisticRegression crash
+    # 3. Handle NaNs
     X = X.fillna(0)
     
     print(f"Feature matrix shape: {X.shape} | NaNs remaining: {X.isna().sum().sum()}")
     return X
 
-
-
-
 def evaluate_and_log(model, X, y, split):
     """
-    Section D: Log all required metrics for the specified split.
+    Logs all metrics for the specified split.
+    Note: 'split' will be 'train', 'val', or 'test'.
     """
     preds = model.predict(X)
-    probs = model.predict_proba(X)[:, 1] # Needed for AUC
+    probs = model.predict_proba(X)[:, 1]
 
+    # These names (e.g., val_accuracy) must match your sweep_job.yml primary_metric
     metrics = {
         f"{split}_accuracy": accuracy_score(y, preds),
         f"{split}_auc": roc_auc_score(y, probs),
@@ -71,10 +69,8 @@ def parse_args():
     parser.add_argument("--test_data", type=str, required=True)
     parser.add_argument("--output", type=str, required=True)
     
-    # NEW: Hyperparameters for Tuning
-    # 'C' is the inverse of regularization strength; smaller values = stronger regularization.
+    # Hyperparameters for Tuning
     parser.add_argument("--C", type=float, default=1.0)
-    # 'solver' is the algorithm used for optimization.
     parser.add_argument("--solver", type=str, default='liblinear')
     
     return parser.parse_args()
@@ -85,11 +81,10 @@ def main():
     # Start MLflow Run
     mlflow.start_run()
     
-    # NEW: Log hyperparameters to MLflow so they appear in the Sweep results
+    # Log hyperparameters so Azure ML can track them
     mlflow.log_param("C", args.C)
     mlflow.log_param("solver", args.solver)
     
-    # Start precise timer
     start_time = time.time()
 
     print("Loading datasets...")
@@ -106,9 +101,9 @@ def main():
     X_test = build_features(test_df)
     y_test = test_df["label"]
 
-    print(f"Training Model with C={args.C}, solver={args.solver} on {X_train.shape[1]} features...")
+    print(f"Training Model with C={args.C}, solver={args.solver}...")
     
-    # UPDATED: LogisticRegression now uses the arguments passed by the Sweep Job
+    # Use args.C and args.solver passed from the Sweep Job
     model = LogisticRegression(
         C=args.C, 
         solver=args.solver, 
@@ -118,10 +113,10 @@ def main():
 
     print("Logging all metrics...")
     evaluate_and_log(model, X_train, y_train, "train")
-    evaluate_and_log(model, X_val, y_val, "val")
+    evaluate_and_log(model, X_val, y_val, "val")  # This logs 'val_accuracy'
     evaluate_and_log(model, X_test, y_test, "test")
 
-    # End timer and log runtime
+    # Log runtime
     total_runtime = time.time() - start_time
     mlflow.log_metric("total_training_runtime_seconds", total_runtime)
     print(f"Total Runtime: {total_runtime:.2f}s")
@@ -131,7 +126,6 @@ def main():
     joblib.dump(model, os.path.join(args.output, "model.pkl"))
     
     mlflow.end_run()
-    
-    
+
 if __name__ == "__main__":
     main()

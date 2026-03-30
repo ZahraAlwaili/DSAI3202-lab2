@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - assignment2_model_training  # CHANGED: This must match your branch name
+      - assignment2_model_training
 
 pool:
   vmImage: ubuntu-latest
