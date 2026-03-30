@@ -1,7 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/sweepJob.schema.json
 type: sweep
-job:
-  type: command
+trial:
   code: ../src
   command: >-
     python train.py 
@@ -9,33 +8,34 @@ job:
     --val_data ${{inputs.val_data}} 
     --test_data ${{inputs.test_data}} 
     --output ${{outputs.output}}
-    --C ${{inputs.C}}
-    --solver ${{inputs.solver}}
-  inputs:
-    # Use your actual Version 5 Data Assets
-    train_data: 
-      type: uri_folder
-      path: azureml:amazon_review_merged_features_train:5
-    val_data: 
-      type: uri_folder
-      path: azureml:amazon_review_merged_features_val:5
-    test_data: 
-      type: uri_folder
-      path: azureml:amazon_review_merged_features_test:5
-    # SWEEP SEARCH SPACE
-    C:
-      type: log_uniform
-      min_value: -5.0 
-      max_value: 2.0  
-    solver:
-      type: choice
-      values: ['liblinear', 'saga']
-  outputs:
-    output:
-      type: uri_folder
+    --C ${{search_space.C}}
+    --solver ${{search_space.solver}}
   environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu@latest
-  compute: azureml:feature-engineering-compute
 
+inputs:
+  train_data: 
+    path: azureml:amazon_review_merged_features_train:5
+    mode: download
+  val_data: 
+    path: azureml:amazon_review_merged_features_val:5
+    mode: download
+  test_data: 
+    path: azureml:amazon_review_merged_features_test:5
+    mode: download
+
+search_space:
+  C:
+    type: choice
+    values: [0.01, 0.1, 1.0, 10.0]
+  solver:
+    type: choice
+    values: ['liblinear', 'saga']
+
+outputs:
+  output:
+    mode: upload
+
+compute: azureml:feature-engineering-compute
 sampling_algorithm: random
 objective:
   goal: maximize
