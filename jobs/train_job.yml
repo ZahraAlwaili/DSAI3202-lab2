@@ -14,7 +14,7 @@ command: >-
   --output ${{outputs.model_output}}  # <--- This MUST MATCH the name above
   --C 10.0 
   --solver liblinear 
-  --run_type run1
+  --run_type run2
 
 inputs:
   train_data:
