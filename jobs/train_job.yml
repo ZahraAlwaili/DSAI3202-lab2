@@ -7,14 +7,14 @@ outputs:
     type: uri_folder
 
 command: >-
-  python src/train.py 
+  python train.py 
   --train_data ${{inputs.train_data}} 
   --val_data ${{inputs.val_data}} 
   --test_data ${{inputs.test_data}} 
-  --output ${{outputs.model_output}}  # <--- This MUST MATCH the name above
+  --output ${{outputs.model_output}}
   --C 10.0 
   --solver liblinear 
-  --run_type run2
+  --run_type run1
 
 inputs:
   train_data:
@@ -26,7 +26,8 @@ inputs:
   test_data:
     type: uri_folder
     path: azureml:amazon_review_merged_features_test:5
+
 environment: azureml:amazon_review_training_env:1
 compute: azureml:feature-engineering-compute
-display_name: amazon-sentiment-training
+display_name: amazon-sentiment-training-run1
 experiment_name: assignment2-training
