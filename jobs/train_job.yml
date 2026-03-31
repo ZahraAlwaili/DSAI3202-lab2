@@ -1,12 +1,20 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 type: command
 code: ../src
+
 command: >-
-  python train.py 
+  python src/train.py 
   --train_data ${{inputs.train_data}} 
   --val_data ${{inputs.val_data}} 
-  --test_data ${{inputs.test_data}}
-  --output ./outputs
+  --test_data ${{inputs.test_data}} 
+  --output ${{outputs.output}}
+  --C 10.0 
+  --solver liblinear 
+  --run_type run1
+
+
+
+
 inputs:
   train_data:
     type: uri_folder
