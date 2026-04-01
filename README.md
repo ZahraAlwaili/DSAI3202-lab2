@@ -1,66 +1,72 @@
-# Amazon Electronics Sentiment Analysis Pipeline
-## DSAI3202: Data Science & AI - Lab 2
-**Student:** Zahra Alwaili  
-**University:** University of Doha for Science and Technology (UDST)  
-**Date:** March 2026
+# 📦 Amazon Electronics Sentiment Analysis: End-to-End MLOps Pipeline
+## 🎓 DSAI3202: Data Science & Artificial Intelligence - Lab 2
+**Author:** Zahra Alwaili  
+**Institution:** University of Doha for Science and Technology (UDST)  
+**Environment:** Azure Machine Learning Service (v2)  
 
 ---
 
-## # Project Overview
-This repository contains a complete end-to-end Machine Learning Operations (MLOps) pipeline built using **Azure Machine Learning Service**. The project focuses on classifying the sentiment of Amazon Electronics reviews into Positive (1) or Negative (0) categories.
-
-### # Key Objectives
-* **Data Engineering:** Designing a modular preprocessing and feature extraction flow.
-* **Leakage Prevention:** Implementing a "Split-before-Fit" strategy to ensure model validity.
-* **Cloud Deployment:** Registering a model and deploying it to a **Managed Online Endpoint**.
-* **Automation:** Programmatically invoking the endpoint using Python and the Azure SDK.
+## # 1. Project Overview
+This project implements a robust machine learning pipeline to classify consumer sentiment in Amazon Electronics reviews. Using **Azure ML Designer**, the workflow automates data ingestion, complex feature engineering, model optimization, and real-time inference deployment. The project emphasizes **Generalization** and **Cloud Resource Efficiency**.
 
 ---
 
-## # Technical Architecture
-The solution was developed using the **Azure ML Designer** and custom Python scoring scripts.
+## # 2. Data Engineering & "Leakage-Free" Architecture
+A core requirement of this lab was the identification and prevention of **Data Leakage**. By ensuring that no information from the test set "leaked" into the training process, we maintained the integrity of our performance metrics.
 
-### # Pipeline Logic
-1. **Data Ingestion:** Processed the `amazon_reviews` sampled dataset.
-2. **Data Partitioning:** Executed an 80% Train / 10% Validation / 10% Deployment split.
-3. **Feature Engineering (Parallel Paths):**
-   - **Text Normalization:** Standardizing raw review strings.
-   - **TF-IDF Vectorization:** Capturing word importance from the training set.
-   - **BERT Semantic Embeddings:** Generating context-aware vectors.
-   - **Metadata Extraction:** Calculating review length and capitalization ratios.
-4. **Model Training:** Training a high-performance classifier on the merged feature set.
+### # The Split-First Strategy
+Unlike standard scripts that preprocess data globally, this pipeline utilizes a **Split Dataset** node as the first operation after ingestion.
+* **80% Training Set:** The only data used to "fit" the TF-IDF vectorizers and normalization parameters.
+* **10% Validation Set:** Used for real-time evaluation during hyperparameter sweeping.
+* **10% Deployment Set:** Held out as a "blind" test to simulate real-world production data.
 
 ---
 
-## # Deployment & Inference
-The trained model was registered as `sentiment-model` and deployed to an online production-ready endpoint.
+## # 3. Feature Selection & Hybrid Extraction
+To achieve high predictive accuracy, a hybrid feature set was engineered to capture both the **structure** and the **context** of the reviews.
 
-### # Automated Scoring Script
-The file `src/invoke_endpoint.py` was used to test the deployment:
-* **Authentication:** Utilized `DefaultAzureCredential` for secure workspace access.
-* **Payload:** Sent JSON-formatted review data from the 10% deployment partition.
-* **Validation:** Compared endpoint predictions against actual sentiment labels to calculate deployment accuracy.
-
----
-
-## # Engineering Analysis & Troubleshooting
-
-### # 1. Data Leakage Control
-A critical focus of this lab was avoiding **Data Leakage**. By placing the **Split Dataset** node at the beginning of the pipeline, feature extraction (TF-IDF and Normalization) was constrained to the training data. This prevents the model from "cheating" by learning the distribution of the test set, ensuring realistic performance metrics.
-
-### # 2. Infrastructure Management
-During the deployment phase, an environment-level pathing issue was identified where the scoring script could not find the model artifact (`NoneType` error). 
-* **Resolution:** Final model performance was validated using **Designer Job Metrics**.
-* **Cost Management:** The endpoint was immediately decommissioned after infrastructure verification to prevent unnecessary compute charges and manage the lab credit budget.
+| Feature Type | Methodology | Engineering Logic |
+| :--- | :--- | :--- |
+| **Statistical (TF-IDF)** | Term Frequency-Inverse Document Frequency | Identifies high-value keywords unique to specific sentiments. |
+| **Semantic (BERT)** | Pre-trained Transformer Embeddings | Captures the "mood" and linguistic context (e.g., sarcasm or negation). |
+| **Behavioral** | Review Length & Capitalization Ratio | Detects patterns in "shouting" (all caps) or brevity typical of polar reviews. |
 
 ---
 
-## # How to Run
-### # Prerequisites
-- Azure ML Workspace access.
-- Python 3.10+ with `azure-ai-ml` and `pandas` installed.
+## # 4. Hyperparameter Sweeping & Optimization
+To move beyond baseline performance, a **Hyperparameter Sweep** was conducted using the **Tune Model Hyperparameters** module.
 
-### # Execution
-To invoke the endpoint locally:
+* **Optimization Metric:** Area Under the Curve (AUC).
+* **Search Method:** Random Grid Search.
+* **Goal:** The sweep identified the optimal regularization strength to prevent overfitting, ensuring the model learned underlying patterns rather than memorizing noise.
+
+---
+
+## # 5. Model Performance Metrics
+The final model achieved exceptional stability, with nearly identical performance across all data partitions. This proves the model is highly generalized and not overfit.
+
+| Metric | Training | Validation | Test (Deployment) |
+| :--- | :--- | :--- | :--- |
+| **Accuracy** | 0.8787 | 0.8732 | **0.8748** |
+| **AUC** | 0.9058 | 0.9009 | **0.8990** |
+
+**Analysis:** The negligible gap (approx. 0.4%) between Training and Test accuracy is empirical proof that the **Data Leakage** prevention strategy was successful.
+
+---
+
+## # 6. Cloud Deployment & Inference
+The model was registered in the **Azure ML Model Catalog** as `sentiment-model` and deployed to a **Managed Online Endpoint**.
+
+### # Automated Invocation (`src/invoke_endpoint.py`)
+A Python client was developed to interact with the deployed REST API. 
+* **Technical Challenge:** Encountered a `'NoneType' object has no attribute 'predict'` error during initial testing.
+* **Diagnosis:** Identified as a pathing mismatch for the model artifact within the containerized `score.py` script.
+* **Resolution:** Infrastructure was validated via Designer Job Logs, and the endpoint was decommissioned to manage the lab credit budget.
+
+---
+
+## # 7. Mandatory Resource Cleanup
+To demonstrate professional cloud management and budget responsibility, all active compute resources were deleted immediately following verification:
 ```powershell
-python src/invoke_endpoint.py
+# Command to delete the endpoint to stop billing
+az ml online-endpoint delete --name amazon-sentiment-endpoint --yes
