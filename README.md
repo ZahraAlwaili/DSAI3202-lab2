@@ -1,5 +1,5 @@
 # 📦 Amazon Electronics Sentiment Analysis: End-to-End MLOps Pipeline
-## 🎓 DSAI3202: Data Science & Artificial Intelligence - Lab 2
+## Assignment 2
 **Author:** Zahra Alwaili  
 **Institution:** University of Doha for Science and Technology (UDST)  
 **Environment:** Azure Machine Learning Service (v2)  
