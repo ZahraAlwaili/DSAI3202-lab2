@@ -19,6 +19,8 @@ Unlike standard scripts that preprocess data globally, this pipeline utilizes a 
 * **80% Training Set:** The only data used to "fit" the TF-IDF vectorizers and normalization parameters.
 * **10% Validation Set:** Used for real-time evaluation during hyperparameter sweeping.
 * **10% Deployment Set:** Held out as a "blind" test to simulate real-world production data.
+  <img width="1603" height="660" alt="image" src="https://github.com/user-attachments/assets/9b584179-693f-4f82-bb94-443ec8a45ff1" />
+
 
 ---
 
@@ -31,6 +33,9 @@ To achieve high predictive accuracy, a hybrid feature set was engineered to capt
 | **Semantic (BERT)** | Pre-trained Transformer Embeddings | Captures the "mood" and linguistic context (e.g., sarcasm or negation). |
 | **Behavioral** | Review Length & Capitalization Ratio | Detects patterns in "shouting" (all caps) or brevity typical of polar reviews. |
 
+<img width="1387" height="464" alt="image" src="https://github.com/user-attachments/assets/32f8f201-b047-445c-8078-2de43d374fc4" />
+
+
 ---
 
 ## # 4. Hyperparameter Sweeping & Optimization
@@ -39,6 +44,8 @@ To move beyond baseline performance, a **Hyperparameter Sweep** was conducted us
 * **Optimization Metric:** Area Under the Curve (AUC).
 * **Search Method:** Random Grid Search.
 * **Goal:** The sweep identified the optimal regularization strength to prevent overfitting, ensuring the model learned underlying patterns rather than memorizing noise.
+
+<img width="1493" height="366" alt="image" src="https://github.com/user-attachments/assets/8932702b-8d61-4617-a1f9-a6338da529d7" />
 
 ---
 
@@ -62,6 +69,9 @@ A Python client was developed to interact with the deployed REST API.
 * **Technical Challenge:** Encountered a `'NoneType' object has no attribute 'predict'` error during initial testing.
 * **Diagnosis:** Identified as a pathing mismatch for the model artifact within the containerized `score.py` script.
 * **Resolution:** Infrastructure was validated via Designer Job Logs, and the endpoint was decommissioned to manage the lab credit budget.
+
+  <img width="1590" height="815" alt="image" src="https://github.com/user-attachments/assets/9d5aa3f6-6291-43dc-ac14-cc86ef33d7e7" />
+
 
 ---
 
