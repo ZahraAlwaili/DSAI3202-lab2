@@ -1,0 +1,13 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineEndpoint.schema.json
+name: amazon-sentiment-endpoint  # Needs to be unique across the region
+auth_mode: key
+
+deployments:
+  - name: blue
+    model: azureml:amazon-review-sentiment:1 # Replace with your registered model name/version
+    code_configuration:
+      code: ../src
+      scoring_script: score.py
+    environment: azureml:amazon_review_training_env:1
+    instance_type: Standard_DS2_v2
+    instance_count: 1
